@@ -9,7 +9,7 @@ main(int argc, char *argv[])
     PyObject *pArgs, *pValue, *pRealArgs; 
     int i;
 
-    char path[] = {"."};
+    // char path[] = {"."};
     char module[] = {"modules.array"};
     char function[] = {"func"};   
  
@@ -19,8 +19,11 @@ main(int argc, char *argv[])
     
     Py_Initialize();
     /* setting $PYTHONPATH */
-    PySys_SetPath(path);
-       
+    // PySys_SetPath(path);
+    PyRun_SimpleString(
+        "import sys\n"
+	"sys.path.append('.')\n"
+    );   
     pName = PyString_FromString(module);
     pModule = PyImport_Import(pName);
     
@@ -32,7 +35,7 @@ main(int argc, char *argv[])
         if (pFunc && PyCallable_Check(pFunc)) {
             /* making a tuple */	
             pRealArgs = PyTuple_New(array_num);
-            pArgs = PyTuple_New(array_size);
+            pArgs = PyList_New(array_size);
             for (i = 0; i < array_size; ++i) {
                 pValue = PyInt_FromLong(foo[i]);
                 if (!pValue) {
@@ -41,7 +44,7 @@ main(int argc, char *argv[])
                     fprintf(stderr, "Cannot convert argument\n");
                     return 1;
                 }
-                PyTuple_SetItem(pArgs, i, pValue);
+                PyList_SetItem(pArgs, i, pValue);
             }
             PyTuple_SetItem(pRealArgs, 0, pArgs);
             pValue = PyObject_CallObject(pFunc, pRealArgs);
