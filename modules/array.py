@@ -5,8 +5,10 @@ import sys
 def func(narray):
     narray = np.asarray(narray)
     print("type: " + str(type(narray))) 
-    print("length: " + str(len(narray)))
-    if sum(narray) > 10:
+    print("shape: " + str(narray.shape))
+    print("sum: " + str(sum(narray)))
+    
+    if sum(narray) % 2:
 	return True
     else:
 	return False

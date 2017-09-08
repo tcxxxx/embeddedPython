@@ -1,5 +1,10 @@
 #include <Python.h>
 #include <stdio.h>
+#include <stdlib.h>
+
+#define WIDTH 32
+#define LENGTH 32
+#define HEIGHT 32
 
 int
 main(int argc, char *argv[])
@@ -8,15 +13,16 @@ main(int argc, char *argv[])
     PyObject *pModule, *pFunc;
     PyObject *pArgs, *pValue, *pRealArgs; 
     int i;
+    srand(time(NULL));    
 
     // char path[] = {"."};
     char module[] = {"modules.array"};
     char function[] = {"func"};   
- 
-    int foo [5] = {1, 2, 3, 4, 5};
-    int array_size = 5;
+
+    int array [LENGTH * WIDTH * HEIGHT];
+    int array_size = LENGTH * WIDTH * HEIGHT;
     int array_num = 1;
-    
+
     Py_Initialize();
     /* setting $PYTHONPATH */
     // PySys_SetPath(path);
@@ -37,7 +43,9 @@ main(int argc, char *argv[])
             pRealArgs = PyTuple_New(array_num);
             pArgs = PyList_New(array_size);
             for (i = 0; i < array_size; ++i) {
-                pValue = PyInt_FromLong(foo[i]);
+		array[i] = rand() % 256;
+		// printf("%d", array[i]);
+                pValue = PyInt_FromLong(array[i]);
                 if (!pValue) {
                     Py_DECREF(pArgs);
                     Py_DECREF(pModule);
@@ -46,7 +54,9 @@ main(int argc, char *argv[])
                 }
                 PyList_SetItem(pArgs, i, pValue);
             }
+	    
             PyTuple_SetItem(pRealArgs, 0, pArgs);
+
             pValue = PyObject_CallObject(pFunc, pRealArgs);
             Py_DECREF(pArgs);
             Py_DECREF(pRealArgs);
