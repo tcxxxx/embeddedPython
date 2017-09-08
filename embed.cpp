@@ -9,10 +9,12 @@
 int
 main(int argc, char *argv[])
 {
-    PyObject *pName;
-    PyObject *pModule, *pFunc;
+	/* PyObjects */
+    PyObject *pName, *pModule, *pFunc;
     PyObject *pArgs, *pValue, *pRealArgs; 
-    int i;
+
+    int i; // 
+    /* For generating random number */
     srand(time(NULL));    
 
     // char path[] = {"."};
@@ -25,16 +27,15 @@ main(int argc, char *argv[])
 
     Py_Initialize();
     /* setting $PYTHONPATH */
-    // PySys_SetPath(path);
+    //'PySys_SetPath(path)' gives rise to new problems
     PyRun_SimpleString(
         "import sys\n"
-	"sys.path.append('.')\n"
-    );   
+		"sys.path.append('.')\n"
+    );  
     pName = PyString_FromString(module);
     pModule = PyImport_Import(pName);
     
     Py_DECREF(pName);
-
     if (pModule != NULL) {
         pFunc = PyObject_GetAttrString(pModule, function);
         /* pFunc is a new reference */
@@ -43,8 +44,7 @@ main(int argc, char *argv[])
             pRealArgs = PyTuple_New(array_num);
             pArgs = PyList_New(array_size);
             for (i = 0; i < array_size; ++i) {
-		array[i] = rand() % 256;
-		// printf("%d", array[i]);
+				array[i] = rand() % 256;
                 pValue = PyInt_FromLong(array[i]);
                 if (!pValue) {
                     Py_DECREF(pArgs);
@@ -54,7 +54,6 @@ main(int argc, char *argv[])
                 }
                 PyList_SetItem(pArgs, i, pValue);
             }
-	    
             PyTuple_SetItem(pRealArgs, 0, pArgs);
 
             pValue = PyObject_CallObject(pFunc, pRealArgs);

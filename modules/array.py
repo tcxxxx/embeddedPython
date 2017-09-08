@@ -1,14 +1,11 @@
 import numpy as np
-import sys
-# print(sys.path)
 
 def func(narray):
     narray = np.asarray(narray)
     print("type: " + str(type(narray))) 
     print("shape: " + str(narray.shape))
     print("sum: " + str(sum(narray)))
-    
     if sum(narray) % 2:
-	return True
+		return True
     else:
-	return False
+		return False
