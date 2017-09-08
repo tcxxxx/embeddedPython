@@ -5,37 +5,36 @@ int
 main(int argc, char *argv[])
 {
     PyObject *pName;
-    PyObject *pModule, *pDict, *pFunc;
+    PyObject *pModule, *pFunc;
     PyObject *pArgs, *pValue, *pRealArgs; 
     int i;
 
     char path[] = {"."};
-    
+    char module[] = {"modules.array"};
+    char function[] = {"func"};   
+ 
     int foo [5] = {1, 2, 3, 4, 5};
+    int array_size = 5;
+    int array_num = 1;
     
-    printf("argv0:%s\n", argv[0]);
-    printf("argv1:%s\n", argv[1]);
-    printf("argv2:%s\n", argv[2]);
-
     Py_Initialize();
-    
+    /* setting $PYTHONPATH */
     PySys_SetPath(path);
        
-    pName = PyString_FromString(argv[1]);
+    pName = PyString_FromString(module);
     pModule = PyImport_Import(pName);
     
     Py_DECREF(pName);
 
     if (pModule != NULL) {
-        pFunc = PyObject_GetAttrString(pModule, argv[2]);
+        pFunc = PyObject_GetAttrString(pModule, function);
         /* pFunc is a new reference */
         if (pFunc && PyCallable_Check(pFunc)) {
-        	/* making a tuple */
-        	
-        	pRealArgs = PyTuple_New(1);
-            pArgs = PyTuple_New(argc - 3);
-            for (i = 0; i < argc - 3; ++i) {
-                pValue = PyInt_FromLong(atoi(argv[i + 3]));
+            /* making a tuple */	
+            pRealArgs = PyTuple_New(array_num);
+            pArgs = PyTuple_New(array_size);
+            for (i = 0; i < array_size; ++i) {
+                pValue = PyInt_FromLong(foo[i]);
                 if (!pValue) {
                     Py_DECREF(pArgs);
                     Py_DECREF(pModule);
@@ -44,14 +43,13 @@ main(int argc, char *argv[])
                 }
                 PyTuple_SetItem(pArgs, i, pValue);
             }
-            
             PyTuple_SetItem(pRealArgs, 0, pArgs);
             pValue = PyObject_CallObject(pFunc, pRealArgs);
             Py_DECREF(pArgs);
             Py_DECREF(pRealArgs);
             
             if (pValue != NULL) {
-                printf("Result of call: %d\n", PyInt_AsLong(pValue));
+                printf("Result of call: %ld\n", PyInt_AsLong(pValue));
                 Py_DECREF(pValue);
             }
             else {
