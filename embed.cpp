@@ -1,6 +1,17 @@
+/* 
+	g++ -c $(python2.7-config --cflags) embed.cpp -o embed.o
+	g++ embed.o -o embed $(python2.7-config --ldflags)
+*/
 #include <Python.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <vector>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 
 #define WIDTH 32
 #define LENGTH 32
@@ -9,21 +20,37 @@
 int
 main(int argc, char *argv[])
 {
+
+	using namespace std;
+
 	/* PyObjects */
     PyObject *pName, *pModule, *pFunc;
     PyObject *pArgs, *pValue, *pRealArgs; 
 
-    int i; // 
-    /* For generating random number */
-    srand(time(NULL));    
-
-    // char path[] = {"."};
-    char module[] = {"modules.array"};
-    char function[] = {"func"};   
+	const char * filename = "sample_image.txt";
 
     int array [LENGTH * WIDTH * HEIGHT];
     int array_size = LENGTH * WIDTH * HEIGHT;
     int array_num = 1;
+	int i = 0;
+	
+	/* getting pixels from file */
+	ifstream file(filename);
+	string line;
+	getline(file, line);
+
+	vector<string> vStr;
+	boost::split(vStr, line, boost::is_any_of(" ,"), boost::token_compress_on);
+	
+	for( vector<string>::iterator it = vStr.begin(); (it + 1) != vStr.end(); ++ it )
+	{
+		array[i] = atoi((*it).c_str());
+		i++;
+	}
+    /* end */
+    
+    char module[] = {"modules.array"};
+    char function[] = {"func"};
 
     Py_Initialize();
     /* setting $PYTHONPATH */
@@ -44,7 +71,6 @@ main(int argc, char *argv[])
             pRealArgs = PyTuple_New(array_num);
             pArgs = PyList_New(array_size);
             for (i = 0; i < array_size; ++i) {
-				array[i] = rand() % 256;
                 pValue = PyInt_FromLong(array[i]);
                 if (!pValue) {
                     Py_DECREF(pArgs);
